@@ -1,0 +1,99 @@
+﻿@page "/Toasty"
+<h3>Taosty and Others</h3>
+
+<DxButton RenderStyle="ButtonRenderStyle.Info" Text="Hello World This dose Nothing"/>
+<DxButton RenderStyle="ButtonRenderStyle.Secondary" Enabled="!isSending" Click="Send">
+    <div class="d-flex">
+        <DxWaitIndicator Visible="isSending" />
+        <span class="mx-2">@Message</span>
+    </div>
+</DxButton>
+<br class="m-5"/>
+
+<DxProgressBar Value="@ProgressValue"
+    ShowIcon="false"/>
+
+<div class="custom-toast-background d-flex align-items-center">
+    <DxButton RenderStyle="ButtonRenderStyle.Secondary" Text="SHOW A TOAST" Click="AddToast" />
+    <DxToastProvider Name="Positioning"
+                     MaxToastCount="3"
+                     DisplayTime="@TimeSpan.FromSeconds(3)"
+                     FreezeOnClick="true"
+                     HorizontalAlignment="HorizontalAlignment"
+                     VerticalAlignment="VerticalAlignment"
+                     Width="@Width"
+                     ShowCloseButton="true" />
+</div>
+
+
+@code {
+    bool isSending = false;
+    string Message => isSending ? "Testing..." : "Test";
+
+    private async Task Send(){
+        ResetProgress();
+        isSending = true;
+        await Task.Delay(3000);
+        isSending = false;
+        RunProgress();
+    }
+
+    bool isRunning;
+    int ProgressValue { get; set; }
+    private void RunProgress()
+    {
+        if (isRunning) return;
+        isRunning = true;
+        InvokeAsync(async () =>
+        {
+            while (isRunning && ProgressValue < 100)
+            {
+                ProgressValue += 10;
+                await Task.Delay(50);
+                StateHasChanged();
+            }
+            isRunning = false;
+        });
+    }
+    private void ResetProgress()
+    {
+        isRunning = false;
+        ProgressValue = 0;
+    }
+    [Inject] IToastNotificationService ToastService { get; set; }
+    static HorizontalAlignment[] HorizontalAlignmentSource { get; set; } = Enum.GetValues<HorizontalAlignment>();
+    static VerticalEdge[] VerticalAlignmentSource { get; set; } = Enum.GetValues<VerticalEdge>();
+    static string[] WidthSource { get; set; } = { "300px", "50%", "auto" };
+    HorizontalAlignment HorizontalAlignment { get; set; } = HorizontalAlignment.Right;
+    VerticalEdge VerticalAlignment { get; set; } = VerticalEdge.Bottom;
+    string Width { get; set; } = WidthSource.First();
+
+
+
+
+    private void AddToast()
+    {
+        List<ToastPrebuild> toastList;
+
+        toastList = TostPrebuildPorvider.GetToastPrebuilds();
+        Console.WriteLine(toastList);
+
+        if (toastList == null || toastList.Count == 0)
+            return;
+
+        var rng = new Random();
+        var i = rng.Next(0, toastList.Count);
+
+        var toast = toastList[i];
+
+        Console.WriteLine($"Showing toast with provider: {toast.Name}");
+
+        ToastService.ShowToast(new ToastOptions
+        {
+            ProviderName = $"{toast.Name}",
+            Title = $"{toast.Title}",
+            Text = $"{ toast.Text}"
+    });
+    }
+
+}
