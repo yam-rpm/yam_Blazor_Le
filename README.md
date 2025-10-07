@@ -1,5 +1,5 @@
 
-# DevExpress Blazor Components
+# DevExpress Blazor Components Übung
 
 Meine Lösung der Blazor Aufgabe
 
