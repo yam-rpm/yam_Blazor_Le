@@ -1,0 +1,77 @@
+﻿@page "/Todo"
+@inject TodoService todoService
+
+<h3>Todo</h3>
+
+<DxGrid Data="@Data"
+        CustomizeEditModel="OnCustomizeEditModel"
+        EditModelSaving="OnEditModelSaving"
+        DataItemDeleting="OnDataItemDeleting"
+        KeyFieldName="Id"
+        EditMode="GridEditMode.PopupEditForm"
+        PopupEditFormHeaderText="Edit Employee">
+        
+    
+    <Columns>
+        
+        <DxGridCommandColumn />
+        <DxGridDataColumn FieldName="Id" />
+        <DxGridDataColumn FieldName="Title"/>
+        <DxGridDataColumn FieldName="Description" />
+        <DxGridDataColumn FieldName="isCompleted" />
+    </Columns>
+    <EditFormTemplate Context="editFormContext">
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="Title:">
+                @editFormContext.GetEditor("Title")
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Description:">
+                @editFormContext.GetEditor("Description")
+            </DxFormLayoutItem>
+            <DxFormLayoutItem Caption="Is Completed:">
+                @editFormContext.GetEditor("isCompleted")
+            </DxFormLayoutItem>
+        </DxFormLayout>
+    </EditFormTemplate>
+
+</DxGrid>
+<p>Grid with Popup Edit</p>
+
+
+@code {
+    List<Todo> Data { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Data = todoService.GetTodos();
+    }
+
+    void OnCustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+        if (e.IsNew)
+        {
+            var editModel = (Todo)e.EditModel;
+            editModel.Id = Data.Max(x => x.Id) + 1;
+        }
+    }
+
+    void OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (Todo)e.EditModel;
+        if (e.IsNew)
+        {
+            Data.Add(editModel);
+        } else
+        {
+            e.CopyChangesToDataItem();
+            
+        }
+
+    }
+    void OnDataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        Data.Remove((Todo)e.DataItem);
+    }
+}
+
+

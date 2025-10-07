@@ -1,0 +1,69 @@
+﻿@page "/Editor"
+<h3>Editors</h3>
+
+<DxCalendar @bind-SelectedDate="@SelectedDate" />
+<DxCalendar @bind-SelectedDates="@SelectedDates"
+EnableMultiSelect="true" />
+
+<div class="card">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <DxCheckBox CheckType="CheckType.Switch"
+                        LabelPosition="LabelPosition.Left"
+                        Checked="@SilentMode"
+                        CheckedChanged="@((bool t) => CheckedChanged(t))"
+                        Alignment="CheckBoxContentAlignment.SpaceBetween">
+                Silent Mode
+            </DxCheckBox>
+        </li>
+        <li class="list-group-item">
+            <DxCheckBox CheckType="CheckType.Switch"
+                        LabelPosition="LabelPosition.Left"
+                        @bind-Checked="@Sound"
+                        Enabled="@Enabled"
+                        Alignment="CheckBoxContentAlignment.SpaceBetween">
+                Enable Sound
+            </DxCheckBox>
+        </li>
+        <li class="list-group-item">
+            <DxCheckBox CheckType="CheckType.Switch"
+                        LabelPosition="LabelPosition.Left"
+                        @bind-Checked="@Vibration"
+                        Enabled="@Enabled"
+                        Alignment="CheckBoxContentAlignment.SpaceBetween">
+                Enable Vibration
+            </DxCheckBox>
+        </li>
+    </ul>
+</div>
+
+
+
+@code {
+    DateTime SelectedDate { get; set; } = DateTime.Now;
+    IEnumerable<DateTime> SelectedDates = new List<DateTime>();
+
+    IEnumerable<DateTime> GetDateTimes()
+    {
+        DateTime baseDate = DateTime.Today;
+        SelectedDates = new List<DateTime>() { baseDate.AddDays(-1), baseDate.AddDays(1)};
+        return SelectedDates;
+    }
+
+    protected override void OnInitialized()
+    {
+        SelectedDates = GetDateTimes();
+    }
+
+    bool Enabled { get; set; } = false;
+    bool SilentMode { get; set; } = true;
+    bool Sound { get; set; } = true;
+    bool Vibration { get; set; } = false;
+    void CheckedChanged(bool value)
+    {
+        SilentMode = value;
+        Enabled = !value;
+    }
+
+
+}

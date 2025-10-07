@@ -1,0 +1,63 @@
+﻿@page "/calc"
+@inject CalcService calcService
+
+<h3>Calculation</h3>
+
+<DxGrid Data="@Data"
+    CustomizeEditModel="OnCustomizeEditModel"
+    EditModelSaving="OnEditModelSaving"
+    DataItemDeleting="OnDataItemDeleting"
+    KeyFieldName="Id"
+    EditMode="GridEditMode.EditCell">
+
+    <Columns>
+        <DxGridCommandColumn EditButtonVisible="false"
+                             CancelButtonVisible="false"
+                             DeleteButtonVisible="false"
+                             SaveButtonVisible="false" 
+                             ShowInColumnChooser="false"
+                             hidden/>
+        <DxGridDataColumn FieldName="Item" />
+        <DxGridDataColumn FieldName="Price" />
+        <DxGridDataColumn FieldName="Amount" />
+        <DxGridDataColumn FieldName="Result" />
+    </Columns>
+</DxGrid>
+
+
+@code {
+    List<calcItem> Data { get; set; }
+    protected override void OnInitialized()
+    {
+        Data  = calcService.GetCalcItems();
+    }
+
+    void OnCustomizeEditModel(GridCustomizeEditModelEventArgs e)
+    {
+
+        if (e.IsNew)
+        {
+            var editModel = (calcItem)e.EditModel;
+            editModel.Id = Data.Max(x => x.Id) + 1;
+        }
+    }
+
+    void OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (calcItem)e.EditModel;
+        if (e.IsNew)
+        {
+            Data.Add(editModel);
+        }
+        else
+        {
+            e.CopyChangesToDataItem();
+
+        }
+    }
+
+    void OnDataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        Data.Remove((calcItem)e.DataItem);
+    }
+}

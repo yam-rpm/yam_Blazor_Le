@@ -1,0 +1,46 @@
+﻿@page "/Drops"
+<h3>Drops</h3>
+<div id="dropdown-overview-target-container">
+    <DxButton Click="() => IsOpen = !IsOpen"
+              RenderStyle="@ButtonRenderStyle.Warning"
+              aria-describedby="dropDown-overview">SHOW A DROPDOWN</DxButton>
+</div>
+<DxDropDown @bind-IsOpen="@IsOpen"
+            Id="dropDown-overview"
+            HeaderVisible="true"
+            HeaderText="Header"
+            BodyText="Hello World this is a Basic Drop Down"
+            PositionMode="DropDownPositionMode.Bottom"
+            Width="max(20vw, 25rem)"
+            PositionTarget="#dropdown-overview-target-container"
+            RestrictionTarget="#Navigation-DropDown-Overview"
+            CloseMode="DropDownCloseMode.Close"
+            PreventCloseOnPositionTargetClick="true">
+</DxDropDown>
+
+<DxDropDown @bind-IsOpen="@IsOpen2" 
+    Id="dropDown-test"
+    HeaderVisible="true"
+    HeaderText="Calendar"
+    PositionTarget="#custom-dropdown"
+    PositionMode="DropDownPositionMode.Bottom">
+        <BodyContentTemplate>
+            <DxCalendar @bind-SelectedDate="@SelectedDate" />
+        </BodyContentTemplate>
+</DxDropDown>
+
+<div id="custom-dropdown">
+    <DxButton Click="() => IsOpen2 = !IsOpen2" RenderStyle="@ButtonRenderStyle.Success" Text="Calendar" />
+</div>
+
+@code {
+    bool IsOpen { get; set; } = false;
+    bool IsOpen2 { get; set; } = false;
+    DateTime SelectedDate { get; set; }
+
+    protected override void OnInitialized()
+    {
+     DateTime SelectedDate = DateTime.Now;
+    }
+}
+
